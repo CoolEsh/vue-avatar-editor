@@ -433,7 +433,8 @@ export default {
             return canvas;
         },
         getImageScaled: function() {
-            const { width, height } = this.getDimensions();
+            let dimensions = this.getDimensions();
+            const width = dimensions.width, height = dimensions.height;
 
             const canvas = document.createElement('canvas');
             canvas.width = width;
