@@ -80,7 +80,7 @@ export default {
             default: 0
         }
     },
-    data () {
+    data: function() {
         return {
             cursor: 'cursorPointer',
             canvas: null,
@@ -102,17 +102,17 @@ export default {
         };
     },
     computed: {
-        canvasWidth () {
+        canvasWidth: function() {
             return this.getDimensions().canvas.width;
         },
-        canvasHeight () {
+        canvasHeight: function() {
             return this.getDimensions().canvas.height;
         },
-        rotationRadian () {
+        rotationRadian: function() {
             return this.rotation * Math.PI / 180;
         }
     },
-    mounted () {
+    mounted: function() {
         let self = this;
         this.canvas = this.$refs.avatarEditorCanvas;
         this.context = this.canvas.getContext('2d');
@@ -121,7 +121,7 @@ export default {
         if (!this.image) {
             var placeHolder = this.svgToImage('<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 65 65"><defs><style>.cls-1{fill:#000;}</style></defs><title>Upload_Upload</title><path class="cls-1" d="M32.5,1A31.5,31.5,0,1,1,1,32.5,31.54,31.54,0,0,1,32.5,1m0-1A32.5,32.5,0,1,0,65,32.5,32.5,32.5,0,0,0,32.5,0h0Z"/><polygon class="cls-1" points="41.91 28.2 32.59 18.65 23.09 28.39 24.17 29.44 31.87 21.54 31.87 40.05 33.37 40.05 33.37 21.59 40.83 29.25 41.91 28.2"/><polygon class="cls-1" points="40.66 40.35 40.66 44.35 24.34 44.35 24.34 40.35 22.34 40.35 22.34 44.35 22.34 46.35 24.34 46.35 40.66 46.35 42.66 46.35 42.66 44.35 42.66 40.35 40.66 40.35"/></svg>');
 
-            placeHolder.onload = function () {
+            placeHolder.onload = function() {
                 var x = self.canvasWidth / 2 - this.width / 2;
                 var y = self.canvasHeight / 2 - this.height / 2;
                 self.context.drawImage(placeHolder, x, y, this.width, this.height);
@@ -131,7 +131,7 @@ export default {
         }
     },
     methods: {
-        drawRoundedRect (context, x, y, width, height, borderRadius) {
+        drawRoundedRect: function(context, x, y, width, height, borderRadius) {
             if (borderRadius === 0) {
                 context.rect(x, y, width, height);
             } else {
@@ -148,7 +148,7 @@ export default {
                 context.translate(-x, -y);
             }
         },
-        svgToImage (rawSVG) {
+        svgToImage: function(rawSVG) {
             let svg = new Blob([rawSVG], {type: 'image/svg+xml;charset=utf-8'});
             let domURL = self.URL || self.webkitURL || self;
             let url = domURL.createObjectURL(svg);
@@ -156,14 +156,14 @@ export default {
             img.src = url;
             return img;
         },
-        setState (state1) {
+        setState: function(state1) {
             var min = Math.ceil(1);
             var max = Math.floor(10000);
 
             this.state = state1;
             this.state.cnt = 'HELLO' + Math.floor(Math.random() * (max - min)) + min;
         },
-        paint () {
+        paint: function() {
             this.context.save();
             this.context.translate(0, 0);
             this.context.fillStyle = 'rgba(' + this.color.slice(0, 4).join(',') + ')';
@@ -193,7 +193,7 @@ export default {
             this.context.fill('evenodd');
             this.context.restore();
         },
-        getDimensions () {
+        getDimensions: function() {
             return {
                 width: this.width,
                 height: this.height,
@@ -204,21 +204,24 @@ export default {
                 }
             };
         },
-        onDrop (e) {
+        onDrop: function(e) {
+            let self = this;
             e = e || window.event;
             e.stopPropagation();
             e.preventDefault();
 
             if (e.dataTransfer && e.dataTransfer.files.length) {
-                // this.props.onDropFile(e)
                 const reader = new FileReader();
                 const file = e.dataTransfer.files[0];
                 this.changed = true;
-                reader.onload = (e) => this.loadImage(e.target.result);
+                reader.onload = function(e) {
+                    self.loadImage(e.target.result);
+                };
                 reader.readAsDataURL(file);
             }
         },
-        onDragStart (e) {
+        onDragStart: function(e) {
+            let self = this;
             e = e || window.event;
             e.preventDefault();
             this.state.drag = true;
@@ -227,8 +230,8 @@ export default {
             this.cursor = 'cursorGrabbing';
             let eventSubject = document;
             let hasMoved = false;
-            let handleMouseUp = (event) => {
-                this.onDragEnd(event);
+            let handleMouseUp = function(event) {
+                self.onDragEnd(event);
                 if (!hasMoved && event.targetTouches) {
                     e.target.click();
                 }
@@ -237,22 +240,22 @@ export default {
                 eventSubject.removeEventListener('touchend', handleMouseUp);
                 eventSubject.removeEventListener('touchmove', handleMouseMove);
             };
-            let handleMouseMove = (event) => {
+            let handleMouseMove = function(event) {
                 hasMoved = true;
-                this.onMouseMove(event);
+                self.onMouseMove(event);
             };
             eventSubject.addEventListener('mouseup', handleMouseUp);
             eventSubject.addEventListener('mousemove', handleMouseMove);
             eventSubject.addEventListener('touchend', handleMouseUp);
             eventSubject.addEventListener('touchmove', handleMouseMove);
         },
-        onDragEnd (e) {
+        onDragEnd: function(e) {
             if (this.state.drag) {
                 this.state.drag = false;
                 this.cursor = 'cursorPointer';
             }
         },
-        onMouseMove (e) {
+        onMouseMove: function(e) {
             e = e || window.event;
             if (this.state.drag === false) {
                 return;
@@ -285,19 +288,17 @@ export default {
             this.state.mx = newState.mx;
             this.state.my = newState.my;
             this.state.image = imageState;
-            // this.setState(newState)
         },
-        replaceImageInBounds () {
+        replaceImageInBounds: function() {
             let imageState = this.state.image;
             imageState.y = this.getBoundedY(imageState.y, this.scale);
             imageState.x = this.getBoundedX(imageState.x, this.scale);
         },
-        loadImage (imageURL) {
+        loadImage: function(imageURL) {
             let imageObj = new Image();
             let self = this;
 
-            // imageObj.onload = () => this.handleImageReady(imageObj);
-            imageObj.onload = () => {
+            imageObj.onload = function() {
                 let imageState = self.getInitialSize(imageObj.width, imageObj.height);
                 self.state.image.x = 0;
                 self.state.image.y = 0;
@@ -309,16 +310,17 @@ export default {
                 self.imageLoaded = true;
                 self.cursor = 'cursorGrab';
             };
-            imageObj.onerror = (err) => console.log('error loading image: ', err);
+            imageObj.onerror = function(err) {
+                console.log('error loading image: ', err);
+            };
 
-            // imageObj.onerror = this.props.onLoadFailure
             if (!this.isDataURL(imageURL)) {
                 imageObj.crossOrigin = 'anonymous';
             }
 
             imageObj.src = imageURL;
         },
-        getInitialSize (width, height) {
+        getInitialSize: function(width, height) {
             let newHeight;
             let newWidth;
 
@@ -339,13 +341,13 @@ export default {
                 width: newWidth
             };
         },
-        isDataURL (str) {
+        isDataURL: function(str) {
             if (str === null) {
                 return false;
             }
             return !!str.match(/^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+=[a-z\-]+)?)?(;base64)?,[a-z0-9!$&',()*+;=\-._~:@\/?%\s]*\s*$/i); // eslint-disable-line no-useless-escape
         },
-        getBoundedX (x, scale) {
+        getBoundedX: function(x, scale) {
             var image = this.state.image;
             var dimensions = this.getDimensions();
             let width = Math.abs(image.width * Math.cos(this.rotationRadian)) + Math.abs(image.height * Math.sin(this.rotationRadian));
@@ -353,7 +355,7 @@ export default {
             widthDiff = Math.max(0, widthDiff);
             return Math.max(-widthDiff, Math.min(x, widthDiff));
         },
-        getBoundedY (y, scale) {
+        getBoundedY: function(y, scale) {
             var image = this.state.image;
             var dimensions = this.getDimensions();
             let height = Math.abs(image.width * Math.sin(this.rotationRadian)) + Math.abs(image.height * Math.cos(this.rotationRadian));
@@ -361,7 +363,7 @@ export default {
             heightDiff = Math.max(0, heightDiff);
             return Math.max(-heightDiff, Math.min(y, heightDiff));
         },
-        paintImage (context, image, border) {
+        paintImage: function(context, image, border) {
             if (image.resource) {
                 var position = this.calculatePosition(image, border);
                 context.save();
@@ -379,13 +381,13 @@ export default {
                 context.restore();
             }
         },
-        transformDataWithRotation (x, y) {
+        transformDataWithRotation: function(x, y) {
             let radian = -this.rotationRadian;
             let rx = x * Math.cos(radian) - y * Math.sin(radian);
             let ry = x * Math.sin(radian) + y * Math.cos(radian);
             return [rx, ry];
         },
-        calculatePosition (image, border) {
+        calculatePosition: function(image, border) {
             image = image || this.state.image;
             var dimensions = this.getDimensions();
             let width = image.width * this.scale;
@@ -404,12 +406,12 @@ export default {
                 width
             };
         },
-        redraw () {
+        redraw: function() {
             this.context.clearRect(0, 0, this.getDimensions().canvas.width, this.getDimensions().canvas.height);
             this.paint();
             this.paintImage(this.context, this.state.image, this.border);
         },
-        getImage () {
+        getImage: function() {
             const cropRect = this.getCroppingRect();
             const image = this.state.image;
 
@@ -430,7 +432,7 @@ export default {
 
             return canvas;
         },
-        getImageScaled () {
+        getImageScaled: function() {
             const { width, height } = this.getDimensions();
 
             const canvas = document.createElement('canvas');
@@ -442,10 +444,10 @@ export default {
 
             return canvas;
         },
-        imageChanged () {
+        imageChanged: function() {
             return this.changed;
         },
-        getCroppingRect () {
+        getCroppingRect: function() {
             const dim = this.getDimensions();
             const frameRect = {
                 x: dim.border,
@@ -462,14 +464,15 @@ export default {
                 height: frameRect.height / imageRect.height
             };
         },
-        clicked (e) {
+        clicked: function(e) {
             if (this.dragged === true) {
                 this.dragged = false;
             } else {
                 this.$refs.input.click();
             }
         },
-        fileSelected (e) {
+        fileSelected: function(e) {
+            let self = this;
             var files = e.target.files || e.dataTransfer.files;
 
             if (!files.length) {
@@ -480,32 +483,34 @@ export default {
             var reader = new FileReader();
 
             this.changed = true;
-            reader.onload = (e) => this.loadImage(e.target.result);
+            reader.onload = function(e) {
+                self.loadImage(e.target.result);
+            };
             reader.readAsDataURL(files[0]);
         }
     },
     watch: {
         state: {
-            handler (val, oldval) {
+            handler: function(val, oldval) {
                 if (this.imageLoaded) {
                     this.redraw();
                 }
             },
             deep: true
         },
-        scale () {
+        scale: function() {
             if (this.imageLoaded) {
                 this.replaceImageInBounds();
                 this.redraw();
             }
         },
-        rotation () {
+        rotation: function() {
             if (this.imageLoaded) {
                 this.replaceImageInBounds();
                 this.redraw();
             }
         },
-        borderRadius () {
+        borderRadius: function() {
             this.redraw();
         }
     }

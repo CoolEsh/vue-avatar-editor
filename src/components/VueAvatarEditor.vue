@@ -92,11 +92,11 @@ export default {
         VueAvatar
     },
     methods: {
-        onImageReady () {
+        onImageReady: function() {
             this.scale = 1;
             this.rotation = 0;
         },
-        finished () {
+        finished: function() {
             return this.$emit('finished', this.$refs.vueavatar.getImageScaled());
         }
     }
