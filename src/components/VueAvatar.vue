@@ -400,10 +400,10 @@ export default {
             x += border - widthDiff;
             y += border - heightDiff;
             return {
-                x,
-                y,
-                height,
-                width
+                x: x,
+                y: y,
+                height: height,
+                width: width
             };
         },
         redraw: function() {
