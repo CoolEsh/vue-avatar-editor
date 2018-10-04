@@ -82,7 +82,7 @@ export default {
             default: function() { return [0, 0, 0, 0.5]; }
         }
     },
-    data () {
+    data: function() {
         return {
             rotation: 0,
             scale: 1
