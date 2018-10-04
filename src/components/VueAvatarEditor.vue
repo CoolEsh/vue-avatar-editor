@@ -79,7 +79,7 @@ export default {
         },
         color: {
             type: Array,
-            default: () => [0, 0, 0, 0.5]
+            default: function() { return [0, 0, 0, 0.5]; }
         }
     },
     data () {
